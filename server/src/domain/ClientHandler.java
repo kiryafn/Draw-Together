@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable {
     private Socket clientSocket;
     private Server server;
     private PrintWriter out;

@@ -1,11 +1,10 @@
 package domain;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class Server {
     private String serverIp;
@@ -13,10 +12,14 @@ public class Server {
     private String serverName;
     private ServerSocket serverSocket;
     private List<String> bannedWords = new ArrayList<>();
-    private Map<String, ClientHandler> players = new ConcurrentHashMap<>();
+    private Map<String, ClientHandler> players = new HashMap<>();
+    private ChatManager chatManager;
+    private DrawingManager drawingManager;
 
     public Server(String configFilePath) {
         loadConfig(configFilePath);
+        chatManager = new ChatManager(this);
+        drawingManager = new DrawingManager(this);
     }
 
     private void loadConfig(String configFilePath) {
@@ -47,41 +50,4 @@ public class Server {
         }
     }
 
-    public void broadcastMessage(String message, String sender) {
-        if (isMessageAllowed(message)) {
-            for (ClientHandler client : players.values()) {
-                if (!client.getClientName().equals(sender)) {
-                    client.sendMessage("[" + sender + "]: " + message);
-                }
-            }
-        } else {
-            players.get(sender).sendMessage("Your message contains prohibited words and will not be sent.");
-        }
-    }
-
-    public synchronized void registerClient(String clientName, ClientHandler clientHandler) {
-        players.put(clientName, clientHandler);
-        updateClientList();
-    }
-
-    public synchronized void unregisterClient(String clientName) {
-        players.remove(clientName);
-        updateClientList();
-    }
-
-    private void updateClientList() {
-        String clientList = String.join(", ", players.keySet());
-        for (ClientHandler client : players.values()) {
-            client.sendMessage("Number of connected clients: " + clientList);
-        }
-    }
-
-    private boolean isMessageAllowed(String message) {
-        for (String banword : bannedWords) {
-            if (message.toLowerCase().contains(banword)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
