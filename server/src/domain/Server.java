@@ -22,6 +22,20 @@ public class Server {
         drawingManager = new DrawingManager(this);
     }
 
+    public void start() {
+        System.out.println(serverName + " launched on " + serverIp + ":" + serverPort);
+        try{
+            serverSocket = new ServerSocket(serverPort);
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+                new Thread(clientHandler).start();
+            }
+        }catch (IOException e) {
+            System.err.println();
+        }
+    }
+
     private void loadConfig(String configFilePath) {
         Properties properties = new Properties();
         try {
@@ -36,18 +50,44 @@ public class Server {
         }
     }
 
-    public void start() {
-        System.out.println(serverName + " launched on " + serverIp + ":" + serverPort);
-        try{
-            serverSocket = new ServerSocket(serverPort);
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-                new Thread(clientHandler).start();
-            }
-        }catch (IOException e) {
-            System.err.println();
+    public synchronized void registerClient(String clientName, ClientHandler clientHandler) {
+        players.put(clientName, clientHandler);
+        updateClientList();
+    }
+
+    public synchronized void unregisterClient(String clientName) {
+        players.remove(clientName);
+        updateClientList();
+    }
+
+    private void updateClientList() {
+        String clientList = String.join(", ", players.keySet());
+        for (ClientHandler client : players.values()) {
+            client.sendMessage(players.size() + " connected clients: " + clientList);
         }
     }
+
+    private void isMessageAllowed(String message) throws BannedWordException {
+        for (String phrase : bannedWords) {
+            if (message.contains(phrase)) {
+                throw new BannedWordException("Your message contains prohibited phrase");
+            }
+        }
+    }
+
+    public void broadcastMessage(String message, String sender) {
+        try {
+            isMessageAllowed(message);
+            for (ClientHandler client : players.values()) {
+                if (!client.getClientName().equals(sender)) {
+                    client.sendMessage("[" + sender + "]: " + message);
+                }
+            }
+
+        } catch (BannedWordException e) {
+            players.get(sender).sendMessage("Your message contains prohibited words and will not be sent.");
+        }
+    }
+}
 
 }
