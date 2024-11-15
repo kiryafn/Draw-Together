@@ -30,7 +30,7 @@ public class ClientHandler implements Runnable {
 
             String message;
             while ((message = in.readLine()) != null) {
-                if (message.equalsIgnoreCase("exit")) {
+                if (message.equalsIgnoreCase("/exit")) {
                     break;
                 }
                 server.broadcastMessage(message, clientName);
