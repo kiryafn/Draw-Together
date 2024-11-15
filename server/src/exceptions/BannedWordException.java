@@ -1,4 +1,4 @@
-package domain;
+package exceptions;
 
 public class BannedWordException extends Exception{
     public BannedWordException(String message) {

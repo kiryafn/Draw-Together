@@ -1,5 +1,6 @@
 package domain;
 
+import exceptions.BannedWordException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;

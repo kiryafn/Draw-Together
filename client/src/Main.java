@@ -1,5 +1,3 @@
-package domain;
-
 import ui.MyFrame;
 
 import javax.swing.*;

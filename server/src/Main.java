@@ -1,4 +1,4 @@
-package domain;
+import domain.Server;
 
 public class Main {
     public static void main(String[] args) {
