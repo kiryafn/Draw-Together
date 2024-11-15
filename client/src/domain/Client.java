@@ -20,7 +20,6 @@ public class Client {
 
             // Инициализация имени клиента
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Введите ваше имя: ");
             nickname = scanner.nextLine();
             out.println(nickname);
 
@@ -30,14 +29,14 @@ public class Client {
             // Цикл для отправки сообщений
             while (true) {
                 String message = scanner.nextLine();
-                if (message.equalsIgnoreCase("exit")) {
+                if (message.equalsIgnoreCase("/exit")) {
                     break; // Завершение работы клиента
                 }
                 out.println(message);
             }
 
         } catch (IOException e) {
-            System.err.println("Ошибка подключения к серверу: " + e.getMessage());
+            System.err.println("Connection to server error: " + e.getMessage());
         } finally {
             closeConnections();
         }
@@ -45,11 +44,13 @@ public class Client {
 
     private void closeConnections() {
         try {
-            out.close();
-            in.close();
-            socket.close();
+            if (socket != null){
+                out.close();
+                in.close();
+                socket.close();
+            }
         } catch (IOException e) {
-            System.err.println("Connection close error" + e.getMessage());
+            System.err.println("Connection close error:" + e.getMessage());
         }
     }
 

@@ -6,4 +6,6 @@ public class ChatManager {
     public ChatManager(Server server) {
         this.server = server;
     }
+
+
 }

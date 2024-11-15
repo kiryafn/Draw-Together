@@ -11,22 +11,19 @@ public class Server {
     private String serverIp;
     private int serverPort;
     private String serverName;
-    private ServerSocket serverSocket;
     private List<String> bannedWords = new ArrayList<>();
-    private Map<String, ClientHandler> players = new HashMap<>();
-    private ChatManager chatManager;
-    private DrawingManager drawingManager;
+    private final Map<String, ClientHandler> players = new HashMap<>();
+    private final ChatManager chatManager = new ChatManager(this);
+    private final DrawingManager drawingManager = new DrawingManager(this);
 
     public Server(String configFilePath) {
         loadConfig(configFilePath);
-        chatManager = new ChatManager(this);
-        drawingManager = new DrawingManager(this);
     }
 
     public void start() {
         System.out.println(serverName + " launched on " + serverIp + ":" + serverPort);
         try{
-            serverSocket = new ServerSocket(serverPort);
+            ServerSocket serverSocket = new ServerSocket(serverPort);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
@@ -51,14 +48,19 @@ public class Server {
         }
     }
 
-    public synchronized void registerClient(String clientName, ClientHandler clientHandler) {
-        players.put(clientName, clientHandler);
-        updateClientList();
+    public void registerClient(String clientName, ClientHandler clientHandler) {
+        synchronized (players) {
+            players.put(clientName, clientHandler);
+            updateClientList();
+        }
     }
 
-    public synchronized void unregisterClient(String clientName) {
-        players.remove(clientName);
-        updateClientList();
+    public void unregisterClient(String clientName) {
+        synchronized (players) {
+            players.remove(clientName);
+            updateClientList();
+
+        }
     }
 
     private void updateClientList() {

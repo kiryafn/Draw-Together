@@ -1,6 +1,7 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class OptionPanel extends JPanel {
@@ -13,6 +14,7 @@ public class OptionPanel extends JPanel {
 
     public OptionPanel() {
         setPreferredSize(new Dimension(635, 300));
+        setVisible(true);
 
         //Add listeners
         colorChooser.getSelectionModel().addChangeListener(e -> currentColor = colorChooser.getColor());
