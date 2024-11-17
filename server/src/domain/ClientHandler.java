@@ -7,15 +7,18 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-    private Socket clientSocket;
-    private Server server;
+    private final Socket clientSocket;
+    private final Server server;
     private PrintWriter out;
     private BufferedReader in;
     private String clientName;
+    private int clientPort;
+    private ChatManager chatManager;
 
     public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
         this.server = server;
+        this.chatManager = new ChatManager(server);
     }
 
     @Override
@@ -24,30 +27,52 @@ public class ClientHandler implements Runnable {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            out.println("Type your name:");
+            // Чтение имени клиента
             clientName = in.readLine();
+            if (clientName == null) {
+                System.err.println("Received null client name.");
+                return;
+            }
+
+            clientPort = clientSocket.getPort();
             server.registerClient(clientName, this);
+            System.out.println("Client connected: " + clientName);
 
             String message;
             while ((message = in.readLine()) != null) {
-                if (message.equalsIgnoreCase("/exit")) {
-                    break;
-                }
-                server.broadcastMessage(message, clientName);
+                if (message.startsWith("/to")) chatManager.processPrivateMessage(message, clientName);
+                else if (message.startsWith("/notto")) chatManager.processPrivateMessage(message, clientName);
+                else chatManager.broadcastMessage(message, clientName);
+
+                System.out.println("Received message from " + clientName + ": " + message);
             }
+
+
+
+
+
         } catch (IOException e) {
             System.err.println("Connection error with: " + clientName + ": " + e.getMessage());
+            e.printStackTrace();
         } finally {
+            server.unregisterClient(clientName);
             try {
-                server.unregisterClient(clientName);
                 clientSocket.close();
-            } catch (IOException e) {
-                System.err.println("Error closing connection to client: " + e.getMessage());
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
 
     public void sendMessage(String message) {
+        out.println(message);
+    }
+
+    public void sendSenderNickname(String message) {
+        out.println(message);
+    }
+
+    public void sendAcessModifier(String message){
         out.println(message);
     }
 

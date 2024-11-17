@@ -1,4 +1,4 @@
-package exceptions;
+package data;
 
 public class BannedWordException extends Exception{
     public BannedWordException(String message) {

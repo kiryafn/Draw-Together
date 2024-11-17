@@ -3,41 +3,33 @@ package domain;
 import ui.MyFrame;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client {
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    private String nickname;
-    private MyFrame frame = new MyFrame();
+    public static String nickname;
+    MyFrame frame = new MyFrame(this);
 
     public Client(String serverAddress, int serverPort) {
         try {
+            nickname = "Adolf";
             socket = new Socket(serverAddress, serverPort);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // Инициализация имени клиента
-            Scanner scanner = new Scanner(System.in);
-            nickname = scanner.nextLine();
+            // Инициализация имени клиента;
             out.println(nickname);
 
             // Поток для чтения сообщений с сервера
-            new Thread(new IncomingMessagesHandler()).start();
+            new Thread(new IncomingMessagesHandler(this, frame.getOptionPanel().getChat())).start();
 
-            // Цикл для отправки сообщений
-            while (true) {
-                String message = scanner.nextLine();
-                if (message.equalsIgnoreCase("/exit")) {
-                    break; // Завершение работы клиента
-                }
-                out.println(message);
-            }
+            System.out.println("Connected");
 
         } catch (IOException e) {
             System.err.println("Connection to server error: " + e.getMessage());
-        } finally {
             closeConnections();
         }
     }
@@ -54,18 +46,11 @@ public class Client {
         }
     }
 
-    // Класс для обработки входящих сообщений от сервера
-    private class IncomingMessagesHandler implements Runnable {
-        @Override
-        public void run() {
-            try {
-                String message;
-                while ((message = in.readLine()) != null) {
-                    System.out.println(message); // Печать сообщения от сервера
-                }
-            } catch (IOException e) {
-                System.err.println("Ошибка при чтении сообщения от сервера: " + e.getMessage());
-            }
-        }
+    public void sendMessageToServer(String message) {
+        out.println(message);
+    }
+
+    public BufferedReader getInputStream(){
+        return in;
     }
 }

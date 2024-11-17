@@ -1,6 +1,6 @@
 package domain;
 
-import exceptions.BannedWordException;
+import data.BannedWordException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,13 +8,12 @@ import java.net.Socket;
 import java.util.*;
 
 public class Server {
+    private final Object object = new Object();
     private String serverIp;
     private int serverPort;
     private String serverName;
     private List<String> bannedWords = new ArrayList<>();
     private final Map<String, ClientHandler> players = new HashMap<>();
-    private final ChatManager chatManager = new ChatManager(this);
-    private final DrawingManager drawingManager = new DrawingManager(this);
 
     public Server(String configFilePath) {
         loadConfig(configFilePath);
@@ -29,8 +28,8 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 new Thread(clientHandler).start();
             }
-        }catch (IOException e) {
-            System.err.println();
+        } catch (IOException e) {
+            System.err.println(e);
         }
     }
 
@@ -49,17 +48,26 @@ public class Server {
     }
 
     public void registerClient(String clientName, ClientHandler clientHandler) {
-        synchronized (players) {
+        synchronized (object) {
             players.put(clientName, clientHandler);
+            for (ClientHandler client : players.values()) {
+                client.sendMessage(clientName + " connected");
+                client.sendMessage("Server");
+                client.sendAcessModifier("All");
+            }
             updateClientList();
         }
     }
 
     public void unregisterClient(String clientName) {
-        synchronized (players) {
+        synchronized (object) {
             players.remove(clientName);
+            for (ClientHandler client : players.values()) {
+                client.sendMessage(clientName + " disconnected");
+                client.sendMessage("Server");
+                client.sendAcessModifier("All");
+            }
             updateClientList();
-
         }
     }
 
@@ -67,28 +75,16 @@ public class Server {
         String clientList = String.join(", ", players.keySet());
         for (ClientHandler client : players.values()) {
             client.sendMessage(players.size() + " connected clients: " + clientList);
+            client.sendMessage("Server");
+            client.sendAcessModifier("All");
         }
     }
 
-    private void isMessageAllowed(String message) throws BannedWordException {
-        for (String phrase : bannedWords) {
-            if (message.contains(phrase)) {
-                throw new BannedWordException("Your message contains prohibited phrase");
-            }
-        }
+    public List<String> getBannedWords() {
+        return bannedWords;
     }
 
-    public void broadcastMessage(String message, String sender) {
-        try {
-            isMessageAllowed(message);
-            for (ClientHandler client : players.values()) {
-                if (!client.getClientName().equals(sender)) {
-                    client.sendMessage("[" + sender + "]: " + message);
-                }
-            }
-
-        } catch (BannedWordException e) {
-            players.get(sender).sendMessage("Your message contains prohibited words and will not be sent.");
-        }
+    public Map<String, ClientHandler> getPlayers() {
+        return players;
     }
 }

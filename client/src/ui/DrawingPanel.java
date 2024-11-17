@@ -38,10 +38,7 @@ public class DrawingPanel extends JPanel {
     private void drawOnCanvas(int x, int y) {
         Graphics2D g2d = canvas.createGraphics();
         g2d.setColor(optionPanel.getCurrentColor());
-        if (optionPanel.getBrushSize() < 10)
-            g2d.fillOval(x, y, optionPanel.getBrushSize(), optionPanel.getBrushSize());
-        else
-            g2d.fillOval(x-10, y-10, optionPanel.getBrushSize(), optionPanel.getBrushSize());
+        g2d.fillOval(x-optionPanel.getBrushSize()/2, y-optionPanel.getBrushSize()/2, optionPanel.getBrushSize(), optionPanel.getBrushSize());
         g2d.dispose(); // Освобождаем ресурсы графики
     }
 
