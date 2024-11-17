@@ -15,7 +15,7 @@ public class Client {
 
     public Client(String serverAddress, int serverPort) {
         try {
-            nickname = "Adolf";
+            nickname = "valera";
             socket = new Socket(serverAddress, serverPort);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

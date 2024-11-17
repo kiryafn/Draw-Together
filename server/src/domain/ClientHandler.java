@@ -41,7 +41,7 @@ public class ClientHandler implements Runnable {
             String message;
             while ((message = in.readLine()) != null) {
                 if (message.startsWith("/to")) chatManager.processPrivateMessage(message, clientName);
-                else if (message.startsWith("/notto")) chatManager.processPrivateMessage(message, clientName);
+                else if (message.startsWith("/notto")) chatManager.processPrivateExcludeMessage(message, clientName);
                 else chatManager.broadcastMessage(message, clientName);
 
                 System.out.println("Received message from " + clientName + ": " + message);
