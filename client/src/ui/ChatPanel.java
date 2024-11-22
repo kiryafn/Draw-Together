@@ -1,8 +1,6 @@
 package ui;
 
-import data.ChatViewContract;
 import domain.ChatLogic;
-import domain.ChatPresenter;
 import domain.Client;
 
 import javax.swing.*;
