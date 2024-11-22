@@ -2,10 +2,7 @@ package domain;
 
 import data.BannedWordException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ChatManager {
     Server server;
@@ -53,7 +50,7 @@ public class ChatManager {
             return;
         }
 
-        server.getPlayers().get(sender).sendMessage(server.getBannedWords().toString());
+        server.getPlayers().get(sender).sendMessage("Set of banned words: " + server.getBannedWords().toString());
         server.getPlayers().get(sender).sendSenderNickname("Server");
         server.getPlayers().get(sender).sendAccessModifier("All");
     }
@@ -85,15 +82,17 @@ public class ChatManager {
             server.getPlayers().get(sender).sendMessage("Empty recipients or message.");
             server.getPlayers().get(sender).sendSenderNickname("Server");
             server.getPlayers().get(sender).sendAccessModifier("All");
-
-
             return;
         }
 
         // Разделяем список получателей на массив
-        recipients.replaceAll(" ", "");
+        recipients = recipients.replaceAll(" ", "");
 
         String[] recipientList = recipients.split(",");
+
+        ArrayList<String> actualRecipients = new ArrayList<>();
+
+        boolean allExists = true;
 
         // Отправляем сообщение каждому получателю
         for (String recipient : recipientList) {
@@ -102,16 +101,20 @@ public class ChatManager {
                 recipientHandler.sendMessage(actualMessage);
                 recipientHandler.sendSenderNickname(sender);
                 recipientHandler.sendAccessModifier("Whisper");
-
+                actualRecipients.add(recipient);
+                allExists = true;
             } else {
                 server.getPlayers().get(sender).sendMessage("User " + recipient + " not found.");
                 server.getPlayers().get(sender).sendSenderNickname("Server");
                 server.getPlayers().get(sender).sendAccessModifier("All");
+                allExists = false;
             }
         }
-        server.getPlayers().get(sender).sendMessage("[" + recipients + "]" + actualMessage);
-        server.getPlayers().get(sender).sendSenderNickname("Me");
-        server.getPlayers().get(sender).sendAccessModifier("Whisper");
+        if (allExists){
+            server.getPlayers().get(sender).sendMessage(actualRecipients.toString() + actualMessage);
+            server.getPlayers().get(sender).sendSenderNickname("Me");
+            server.getPlayers().get(sender).sendAccessModifier("Whisper");
+        }
     }
 
 

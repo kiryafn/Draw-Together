@@ -20,11 +20,9 @@ public class IncomingMessagesHandler implements Runnable {
         try (BufferedReader in = client.getInputStream()) {
             String message;
             while ((message = in.readLine()) != null) {
-                synchronized (chatPanel) {
                     String sender = in.readLine();
                     String group = in.readLine();
                     chatPanel.getChatLogic().drawMessage(message, sender, group);
-                }
             }
 
         } catch (IOException e) {

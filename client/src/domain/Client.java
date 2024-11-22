@@ -20,11 +20,13 @@ public class Client {
                     ConnectionInfo connectionInfo = connect();
 
                     socket = new Socket(connectionInfo.ip, connectionInfo.port);
+
+                    //todo ОТКЛЮЧАТЬ СОКЕТ
                     out = new PrintWriter(socket.getOutputStream(), true);
                     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                    // Отправляем никнейм на сервер
                     frame = new MyFrame(this);
+                    // Отправляем никнейм на сервер
                     out.println(nickname);
 
                     // Поток для чтения сообщений с сервера

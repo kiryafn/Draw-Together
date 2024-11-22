@@ -37,7 +37,6 @@ public class ChatLogic {
 
         if(sender.equals("Server")) {
             appendMessage("(Server) " + message + "\n", new Color(200, 0, 255));
-            return;
         }
         else if (group.equals("Whisper")) {
             drawPrivateMessage(message, sender, group);
@@ -66,7 +65,7 @@ public class ChatLogic {
     public void drawPrivateMessage(String message, String sender, String group) {
         if (!sender.equals("Me")) {
             appendMessage("(" + group + ")", new Color(237, 104, 255));
-            appendMessage("from " + sender + ": ", new Color(124, 39, 184));
+            appendMessage(" from " + sender + ": ", new Color(124, 39, 184));
             appendMessage(message + "\n", Color.BLACK);
         } else {
             int start = message.indexOf('[') + 1;
@@ -76,7 +75,7 @@ public class ChatLogic {
                 String actualMessage = message.substring(end + 1).trim(); // Само сообщение после ']'
 
                 appendMessage("(" + group + ")", new Color(237, 104, 255));
-                appendMessage("to " + recipients + ": ", new Color(124, 39, 184));
+                appendMessage(" to " + recipients + ": ", new Color(124, 39, 184));
                 appendMessage(actualMessage + "\n", Color.BLACK);
             }
         }
@@ -86,7 +85,7 @@ public class ChatLogic {
     public void drawPrivateExcludedMessage(String message, String sender, String group) {
         if (!sender.equals("Me")) {
             appendMessage("(" + group + ")", new Color(237, 104, 255));
-            appendMessage("from " + sender + ": ", new Color(124, 39, 184));
+            appendMessage(" from " + sender + ": ", new Color(124, 39, 184));
             appendMessage(message + "\n", Color.BLACK);
         } else {
             int start = message.indexOf('[') + 1;
@@ -96,7 +95,7 @@ public class ChatLogic {
                 String actualMessage = message.substring(end + 1).trim(); // Само сообщение после ']'
 
                 appendMessage("(" + group + ")", new Color(237, 104, 255));
-                appendMessage("to all except " + recipients + ": ", new Color(124, 39, 184));
+                appendMessage(" to all except " + recipients + ": ", new Color(124, 39, 184));
                 appendMessage(actualMessage + "\n", Color.BLACK);
             }
         }
