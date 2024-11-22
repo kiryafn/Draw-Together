@@ -67,7 +67,7 @@ public class ChatManager {
         // Извлекаем список получателей
         int start = message.indexOf('[') + 1;
         int end = message.indexOf(']');
-        String recipients = message.substring(start, end); // Например: "user1,user2"
+        String recipients = message.substring(start, end);
         String actualMessage = message.substring(end + 1); // Текст сообщения
 
         try {
@@ -92,7 +92,7 @@ public class ChatManager {
 
         ArrayList<String> actualRecipients = new ArrayList<>();
 
-        boolean allExists = true;
+        int existing = 0;
 
         // Отправляем сообщение каждому получателю
         for (String recipient : recipientList) {
@@ -102,16 +102,15 @@ public class ChatManager {
                 recipientHandler.sendSenderNickname(sender);
                 recipientHandler.sendAccessModifier("Whisper");
                 actualRecipients.add(recipient);
-                allExists = true;
+                existing++;
             } else {
                 server.getPlayers().get(sender).sendMessage("User " + recipient + " not found.");
                 server.getPlayers().get(sender).sendSenderNickname("Server");
                 server.getPlayers().get(sender).sendAccessModifier("All");
-                allExists = false;
             }
         }
-        if (allExists){
-            server.getPlayers().get(sender).sendMessage(actualRecipients.toString() + actualMessage);
+        if (existing > 0){
+            server.getPlayers().get(sender).sendMessage(actualRecipients + actualMessage);
             server.getPlayers().get(sender).sendSenderNickname("Me");
             server.getPlayers().get(sender).sendAccessModifier("Whisper");
         }
@@ -130,7 +129,7 @@ public class ChatManager {
         // Извлекаем список получателей
         int start = message.indexOf('[') + 1;
         int end = message.indexOf(']');
-        String excludedRecipients = message.substring(start, end); // Например: "user1,user2"
+        String excludedRecipients = message.substring(start, end);
         String actualMessage = message.substring(end + 1); // Текст сообщения
 
         try {
@@ -139,7 +138,6 @@ public class ChatManager {
             server.getPlayers().get(sender).sendMessage("Your message contains prohibited words and will not be sent.");
             server.getPlayers().get(sender).sendSenderNickname("Server");
             server.getPlayers().get(sender).sendAccessModifier("All");
-
         }
 
         if (excludedRecipients.isEmpty() || actualMessage.isEmpty()) {
@@ -180,7 +178,7 @@ public class ChatManager {
     }
 
     public void processGetPlayers(String message, String sender) {
-        if (!message.matches("^/getplayers$")) {
+        if (!message.matches("^/getplayers")) {
             server.getPlayers().get(sender).sendMessage("Invalid command format. Type '/getplayers'");
             server.getPlayers().get(sender).sendSenderNickname("Server");
             server.getPlayers().get(sender).sendAccessModifier("");

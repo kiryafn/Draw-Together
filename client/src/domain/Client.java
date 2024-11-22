@@ -16,14 +16,18 @@ public class Client {
 
     public Client() {
             while (true) {
-                try {
                     ConnectionInfo connectionInfo = connect();
 
-                    socket = new Socket(connectionInfo.ip, connectionInfo.port);
-
-                    //todo ОТКЛЮЧАТЬ СОКЕТ
-                    out = new PrintWriter(socket.getOutputStream(), true);
-                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    try {
+                        socket = new Socket(connectionInfo.ip, connectionInfo.port);
+                        out = new PrintWriter(socket.getOutputStream(), true);
+                        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    }catch (IOException e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        continue;
+                    }catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
 
                     frame = new MyFrame(this);
                     // Отправляем никнейм на сервер
@@ -33,11 +37,6 @@ public class Client {
                     new Thread(new IncomingMessagesHandler(this, frame.getOptionPanel().getChat())).start();
 
                     break;
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
             }
     }
 
@@ -64,8 +63,8 @@ public class Client {
     public ConnectionInfo connect(){
         while (true){
             try {
-                JTextField ipField = new JTextField("127.0.0.1"); // Предустановленное значение
-                JTextField portField = new JTextField("1488");   // Предустановленное значение
+                JTextField ipField = new JTextField("127.0.0.1");
+                JTextField portField = new JTextField("2706");
                 JTextField nameField = new JTextField();
                 Object[] message = {
                         "Server IP:", ipField,
@@ -74,9 +73,10 @@ public class Client {
                 };
 
                 int option = JOptionPane.showConfirmDialog(null, message, "Connect to Server", JOptionPane.OK_CANCEL_OPTION);
+
                 if (option != JOptionPane.OK_OPTION) {
                     JOptionPane.showMessageDialog(null, "Connection cancelled by user.", "Error", JOptionPane.ERROR_MESSAGE);
-                    continue; // Возвращаемся в начало цикла
+                    System.exit(0);
                 }
 
                 String serverAddress = ipField.getText().trim();
@@ -85,7 +85,7 @@ public class Client {
 
                 if (serverAddress.isEmpty() || portText.isEmpty() || nickname.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
-                    continue; // Возвращаемся в начало цикла
+                    continue;
                 }
 
                 int serverPort = Integer.parseInt(portText);
