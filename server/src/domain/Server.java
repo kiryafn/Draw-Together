@@ -1,6 +1,5 @@
 package domain;
 
-import data.BannedWordException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,7 +10,6 @@ public class Server {
     private final Object object = new Object();
     private String serverIp;
     private int serverPort;
-    private String serverName;
     private List<String> bannedWords = new ArrayList<>();
     private final Map<String, ClientHandler> players = new HashMap<>();
 
@@ -20,7 +18,7 @@ public class Server {
     }
 
     public void start() {
-        System.out.println(serverName + " launched on " + serverIp + ":" + serverPort);
+        System.out.println("Server launched on " + serverIp + ":" + serverPort);
         try{
             ServerSocket serverSocket = new ServerSocket(serverPort);
             while (true) {
@@ -29,7 +27,7 @@ public class Server {
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -40,7 +38,6 @@ public class Server {
             properties.load(input);
             serverIp = properties.getProperty("server_ip");
             serverPort = Integer.parseInt(properties.getProperty("server_port"));
-            serverName = properties.getProperty("server_name");
             bannedWords = Arrays.asList(properties.getProperty("banned_words").split(","));
         } catch (IOException e) {
             System.err.println("Failed to load config file " + configFilePath);
@@ -53,7 +50,7 @@ public class Server {
             for (ClientHandler client : players.values()) {
                 client.sendMessage(clientName + " connected");
                 client.sendMessage("Server");
-                client.sendAcessModifier("All");
+                client.sendAccessModifier("");
             }
             updateClientList();
         }
@@ -65,7 +62,7 @@ public class Server {
             for (ClientHandler client : players.values()) {
                 client.sendMessage(clientName + " disconnected");
                 client.sendMessage("Server");
-                client.sendAcessModifier("All");
+                client.sendAccessModifier("");
             }
             updateClientList();
         }
@@ -76,7 +73,7 @@ public class Server {
         for (ClientHandler client : players.values()) {
             client.sendMessage(players.size() + " connected clients: " + clientList);
             client.sendMessage("Server");
-            client.sendAcessModifier("All");
+            client.sendAccessModifier("All");
         }
     }
 

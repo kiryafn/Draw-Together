@@ -39,8 +39,7 @@ public class ChatLogic {
             appendMessage("(Server) " + message + "\n", new Color(200, 0, 255));
             return;
         }
-
-        if (group.equals("Whisper")) {
+        else if (group.equals("Whisper")) {
             drawPrivateMessage(message, sender, group);
         } else if (group.equals("!Whisper")) {
             group = "Whisper";
@@ -57,10 +56,9 @@ public class ChatLogic {
         chatPanel.getInputField().setText("");
     }
 
-    //@Override
     public void drawBroadcastMessage(String message, String sender, String group) {
             appendMessage("(" + group + ") ", new Color(93, 185, 216));
-            appendMessage(sender + ": ", new Color(124, 39, 184, 255));
+            appendMessage(sender + ": ", sender.equals("Me") ? new Color(62, 152, 0) : new Color(124, 39, 184, 255));
             appendMessage(message + "\n", Color.BLACK);
     }
 

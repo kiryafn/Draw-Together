@@ -29,10 +29,6 @@ public class ClientHandler implements Runnable {
 
             // Чтение имени клиента
             clientName = in.readLine();
-            if (clientName == null) {
-                System.err.println("Received null client name.");
-                return;
-            }
 
             clientPort = clientSocket.getPort();
             server.registerClient(clientName, this);
@@ -40,8 +36,14 @@ public class ClientHandler implements Runnable {
 
             String message;
             while ((message = in.readLine()) != null) {
-                if (message.startsWith("/to")) chatManager.processPrivateMessage(message, clientName);
-                else if (message.startsWith("/notto")) chatManager.processPrivateExcludeMessage(message, clientName);
+                if (message.startsWith("/")){
+                    if (message.startsWith("/to")) chatManager.processPrivateMessage(message, clientName);
+                    else if (message.startsWith("/notto")) chatManager.processPrivateExcludeMessage(message, clientName);
+                    else if (message.startsWith("/bannedwords")) chatManager.processBannedWords(message, clientName);
+                    else if (message.startsWith("/getplayers")) chatManager.processGetPlayers(message, clientName);
+                    else if (message.startsWith("/help")) chatManager.processHelpCommand(message, clientName);
+                    else chatManager.processUnknownCommand(message, clientName);
+                }
                 else chatManager.broadcastMessage(message, clientName);
 
                 System.out.println("Received message from " + clientName + ": " + message);
@@ -72,7 +74,7 @@ public class ClientHandler implements Runnable {
         out.println(message);
     }
 
-    public void sendAcessModifier(String message){
+    public void sendAccessModifier(String message){
         out.println(message);
     }
 
